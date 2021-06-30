@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(MaterialApp(home:NamingScreen()));
@@ -27,29 +29,33 @@ class NamingScreenState extends State<NamingScreen> {
     double width=MediaQuery.of(context).size.width;
     double height=MediaQuery.of(context).size.height;
     return Scaffold(
+      appBar: AppBar(
+        title: Text("SIX Corona tracker", style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.normal)),
+        backgroundColor: Color(0xffdd2212),
+        centerTitle: true,
+      ),
       body: Container(
         margin: const EdgeInsets.only(left: 16.0, right: 16.0),
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-
             children: [
               Container(
-                margin: const EdgeInsets.only(top: 80.0, bottom: 36.0),
+                margin: const EdgeInsets.only(top: 200.0, bottom: 36.0),
                 width: width,
                 height: height*0.15,
-                child: Image.asset('assets/six_group_logo.png',fit: BoxFit.fill,),
+                child: Image.asset('assets/six_group_logo.png',fit: BoxFit.fill),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              Container(
+                margin: const EdgeInsets.only(top: 20.0, bottom: 10.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('Willkommen zur Six Pandemie\n Tracing App',style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
+                    Text('Trage dein Name ein:', style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal)),
                   ],
                 ),
               ),
-              SizedBox(height: 30.0,),
+              SizedBox(height: 30.0),
               TextFormField(
                 controller: textController,
                 decoration: InputDecoration(
@@ -69,26 +75,135 @@ class NamingScreenState extends State<NamingScreen> {
                   }
                 },
               ),
-              SizedBox(height: 20.0,),
+              SizedBox(height: 20.0),
+              Container(
+                width: 150.0,
+                height: 50.0,
+                child :RaisedButton(
+                  child: Text('Weiter', style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal, color: Colors.white)),
+                  color: Color(0xffdd2212),
+                  splashColor: Colors.white,
+                  onPressed: (){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CapturingVisitingDataState())
+                    );
+                    return showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                              content: Text(textController.text)
+                          );
+                        }
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+//On this Screen we Capture all the Data and use the QR-Scanner
+class CapturingVisitingDataState extends StatelessWidget {
+  final textController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double height = MediaQuery
+        .of(context)
+        .size
+        .height;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("SIX Corona tracker", style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.normal)),
+        backgroundColor: Color(0xffdd2212),
+        centerTitle: true,
+      ),
+      body: Container(
+        margin: const EdgeInsets.only(left: 16.0, right: 16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 200.0, bottom: 36.0),
+                width: width,
+                height: height * 0.15,
+                child: Image.asset('assets/six_group_logo.png', fit: BoxFit.fill)
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text('Registriere deine betretenen Meetingräume', style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal)),
+                  ],
+                ),
+              ),
+              SizedBox(height: 30.0),
+              TextFormField(
+                controller: textController,
+                decoration: InputDecoration(
+                  labelText: 'Zimmer Nummer',
+                  hintText: 'QR-Code',
+                  suffixIcon: Icon(Icons.email),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please enter your Email';
+                  } else if (RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value)) {
+                    return 'Please enter a valid Email';
+                  } else {
+                    return null;
+                  }
+                },
+              ),
+              SizedBox(height: 20.0),
               RaisedButton(
-                child: Text('Weiter'),
-                color: Color(0xffe42313),
-                //Navigates t
+                child: Text('QR Scanner', style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal, color: Colors.black)),
+                color: Color(0xffffffff),
                 onPressed: (){
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CapturingVisitingDataState()),
+                    MaterialPageRoute(builder: (context) => QRView())
                   );
                   return showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        content: Text(textController.text),
-                      );
-                    }
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                            content: Text(textController.text)
+                        );
+                      }
                   );
+
                 },
               ),
+              SizedBox(height: 20.0),
+              Container(
+                width: 200.0,
+                height: 50.0,
+                child :RaisedButton(
+                  child: Text('Standort Speichern', style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal, color: Colors.white)),
+                  color: Color(0xffe42313),
+                  splashColor: Colors.white,
+                  onPressed: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ProfileScreen()),
+                    );
+                  },
+                ),
+              )
             ],
           ),
         ),
@@ -104,6 +219,11 @@ class ProfileScreen extends StatelessWidget {
     double width=MediaQuery.of(context).size.width;
     double height=MediaQuery.of(context).size.height;
     return Scaffold(
+      appBar: AppBar(
+        title: Text("SIX Corona tracker", style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.normal)),
+        backgroundColor: Color(0xffdd2212),
+        centerTitle: true,
+      ),
       body: Container(
         margin: const EdgeInsets.only(left: 16.0, right: 16.0),
         child: SingleChildScrollView(
@@ -121,11 +241,11 @@ class ProfileScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('Profil',style: TextStyle(fontSize: 25.0,fontWeight: FontWeight.bold),),
+                    Text('Dein Profil', style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal)),
                   ],
                 ),
               ),
-              SizedBox(height: 30.0,),
+              SizedBox(height: 30.0),
               TextFormField(
                 decoration: InputDecoration(
                   labelText: 'Vorname Nachname',
@@ -164,102 +284,57 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
+class CounterStorage {
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
 
-//On this Screen we Capture all the Data and use the QR-Scanner
-class CapturingVisitingDataState extends StatelessWidget {
-  final textController = TextEditingController();
-  @override
-  Widget build(BuildContext context) {
-    double width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    double height = MediaQuery
-        .of(context)
-        .size
-        .height;
-    return Scaffold(
-      body: Container(
-        margin: const EdgeInsets.only(left: 16.0, right: 16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 100.0, bottom: 36.0),
-                width: width,
-                height: height * 0.15,
-                child: Image.asset('assets/six_group_logo.png', fit: BoxFit.fill,),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text('Registriere deine Arbeitsplätze', style: TextStyle(
-                        fontSize: 25.0, fontWeight: FontWeight.bold),),
-                  ],
-                ),
-              ),
-              SizedBox(height: 30.0,),
-              TextFormField(
-                controller: textController,
-                decoration: InputDecoration(
-                  labelText: 'Zimmer Nummer',
-                  hintText: 'QR-Code',
-                  suffixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter your Email';
-                  } else if (RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value)) {
-                    return 'Please enter a valid Email';
-                  } else {
-                    return null;
-                  }
-                },
-              ),
-              SizedBox(height: 20.0,),
-              RaisedButton(
-                child: Text('QR Scanner'),
-                color: Color(0xffffffff),
-                onPressed: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => QRView()),
-                  );
-                  return showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content: Text(textController.text),
-                        );
-                      }
-                  );
-
-                },
-              ),
-              SizedBox(height: 20.0,),
-              RaisedButton(
-                child: Text('Standort Speichern'),
-                color: Color(0xffe42313),
-                onPressed: (){
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ProfileScreen()),
-                  );
-
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return directory.path;
   }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/UserDocument.txt');
+  }
+
+  Future<int> readCounter() async {
+    try {
+      final file = await _localFile;
+
+      // Read the file
+      final contents = await file.readAsString();
+
+      return int.parse(contents);
+    } catch (e) {
+      // If encountering an error, return 0
+      return 0;
+    }
+  }
+
+  Future<File> writeCounter(int counter) async {
+    final file = await _localFile;
+
+    // Write the file
+    return file.writeAsString('$counter');
+  }
+}
+
+class Date  {
+  // Get current date
+  Future<String> get currentDate async {
+    var now = new DateTime.now();
+    var formatter = new DateFormat('yyyy-MM-dd');
+    String formattedDate = formatter.format(now);
+    return formattedDate;
+  }
+
+  // Check if date is current date
+  /*Future<bool> _checkDate(date) {
+    if (date == get currentDate) {
+      return true
+    } else {
+      return false
+    }
+  }*/
 }
 
 class SignUpForm extends StatefulWidget {
