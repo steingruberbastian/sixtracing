@@ -234,7 +234,7 @@ class ProfileScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(top: 80.0, bottom: 36.0),
                 width: width,
                 height: height*0.15,
-                child: Image.asset('assets/six_group_logo.png',fit: BoxFit.fill,),
+                child: Image.asset('assets/six_group_logo.png',fit: BoxFit.fill   ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
